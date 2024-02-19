@@ -6,6 +6,8 @@ Due to the prevalence of protections such as [Address Space Layout Randomization
 
 <!-- * Examples of malware that has bypassed protections.
 > Need a better understanding before more note structure can be given -->
+
+**Notice**: Please setup the Windows and Linux systems as described in [SystemSetup](./SystemSetup/README.md)!
 ## Windows Protections
 In order to exploit VChat with the protections enabled we will need to understand what those protections are doing to prevent attackers from successfully exploiting the system. Otherwise we are unable to create effective measures to bypass them. 
 
