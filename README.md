@@ -146,7 +146,7 @@ To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible modu
 
 1. In Immunity Debugger we can try generating a ROP chain with a single module. 
     
-    <video controls src="R1.mp4" title="Title"></video>
+	https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/0592e77f-e7ea-4d89-bf7e-f0ebb6cdb870
 
     1. This can be done by using the following command, replace vchat.exe with a few other dlls:
         ```sh
@@ -172,7 +172,7 @@ To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible modu
    1. Detemine some DLLs that we could use that are loaded by the VChat process. There are two common methods to do this.
       1. In Immunity Debugger 
 
-        <video controls src="EX-Mod.mp4" title="Title"></video>
+	https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/ad786202-099d-4dc7-bdda-f7e9ef1d5b3a
 
          1.  Access the Executable Modules table, Click on the View Tab -> Executable Module
 
@@ -185,7 +185,7 @@ To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible modu
             * Immunity debugger organizes the DLLs under the executable modules table as they a *shared libraries* that contain executable code that the main process will call! 
       1. Using the Windows Sysinternals tool [ListDLLs](https://learn.microsoft.com/en-us/sysinternals/downloads/listdlls). If you plan to use this method you should download this and add it to your path or simply execute the commands from the folder the executable is located in.
         
-        <video controls src="ListDLL.mp4" title="Title"></video>
+	https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/16fa708d-cf57-4d0f-90fa-eef338818386
 
         1. Open Task Manager, and locate the VChat Process.
 
@@ -351,7 +351,7 @@ We can verify this ROP chain and our gadget offsets by modifying our exploit cod
 
 3. Attack VChat using the [exploit0](./SourceCode/exploit0.py) program and step through the ROP chain to ensure that it has been constructed properly.
 
-    <video controls src="E0.mp4" title="Title"></video>
+	https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/001e199c-0874-4224-8eee-dea220ce3160
 
 ### Automatically Restart vulnserver.exe when it crashes
 While brute forcing the base address, some bad addresses will crash the target VChat. We need to write a simple batch (bat) file for VChat to restart automatically, this will simplify the exploitation process.  
@@ -393,15 +393,15 @@ Now we can modify the exploit program to brute force the base address of the tar
 
     3. Now we step through until we have passed through the ```VirtualProtect(...)``` function and can see the shellcode, depending on the construction of the ROP chain it may not work as is shown below.
 
-        <video controls src="E1a.mp4" title="Title"></video>
+        https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/eed5beff-3e67-4762-9da8-8656aa09b52d
 
-        * Notice that in my case the process crashed! In this case the instructions to set the `EBP` register. 
+        * Notice that in my case the process crashed! In this case the instructions to set the `EBP` register.
 
             <img src="Images/I21.png" width=600>
 
     4. If the system crashes you will need to modify the exploit, or generate an alternative ROP chain that does not contain collisions! The solution could be as simple as changing the order the gadgets are executed in, or you may need to find alternative gadgets.   
 
-        <video controls src="E1b.mp4" title="Title"></video>
+	https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/f7da333e-cc33-4248-8ffc-f7c39d000582
 
         * In this case the EBP register is set with a simple `POP` instruction, so I was able to move the instruction used to set the `EBP` register to the end of the ROP chain. You can see this in the example [exploit1b.py](./SourceCode/exploit1b.py) code.   
             ```
