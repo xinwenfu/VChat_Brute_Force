@@ -144,6 +144,9 @@ However, in this scenario, since the addresses of DLLs will change on system res
 
 To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible module, and then we will brute force the base address of this target module. For this to work we assume the target application restarts shortly after a fatal error occurs.
 
+> [!IMPORTANT]
+> The offsets and addresses shown in the following screenshots may differ from those used in the python and ruby code in this repository. This is because the offsets change slightly between the Windows 10 version of VChat compiled with GCC and the Windows 11 version compiled with the Visual Studio compiler.
+
 ### Generate ROP chain
 > [!NOTE]
 > Before running the ROP generation commands you can change `mona.py`'s working folder to make the results easier to find using the command `!mona config -set workingfolder c:\logs\E11` where `c:\logs\E11` is a path to the folder we want to save the results in.
