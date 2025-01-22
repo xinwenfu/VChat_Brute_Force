@@ -39,7 +39,8 @@ class MetasploitModule < Msf::Exploit::Remote	# This is a remote exploit module 
         [
           [ 'EssFuncDLL-retn',
             {
-              'retn' => 0x62501023 # This will be available in [target['jmpesp']]
+              # unused
+              'retn' => 0x62501029 # This will be available in [target['retn']]
             }
           ]
         ],
