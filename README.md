@@ -96,7 +96,7 @@ The following sections cover the process that should (Or may) be followed when p
 >  You will **need** to recompile VChat for this exploit to work as expected. This is done to eliminate a null byte from the base address of the executable. This is discussed in the [VChat Setup](#vchat-setup) section
 
 ### Influences of Enabling Windows Exploit Protection
-Before enabling Windows Exploit Protection, the base addresses of *vulnserver.exe* and *essfunc.dll* are fixed at `0x00400000` and `0x62500000` respectively. This is because both are not marked as ASLR-compatible because they were not linked with the `/DYNAMICBASE` flag at compile time. Other modules in the Windows system are ASLR-compatible. Hence, their base addresses will change if the machine restarts as discussed [previously](#address-space-layout-randomization).
+Before enabling Windows Exploit Protection, the base addresses of *vulnserver.exe* and *essfunc.dll* are fixed at `0x00400000` and `0x62500000` respectively. This is because both are not marked as ASLR-compatible because they were not linked with the `/DYNAMICBASE` flag at compile time (?). Other modules in the Windows system are ASLR-compatible. Hence, their base addresses will change if the machine restarts as discussed [previously](#address-space-layout-randomization).
 
 1. We can first look at the base addresses of the modules VChat loads: In Immunity debugger access the Executable modules table by accessing the following tabs (View -> Executable modules or <Alt+E>) This is shown below.
 
