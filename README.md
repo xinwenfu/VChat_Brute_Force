@@ -96,7 +96,7 @@ The following sections cover the process that should (Or may) be followed when p
 >  You will **need** to recompile VChat for this exploit to work as expected. This is done to eliminate a null byte from the base address of the executable. This is discussed in the [VChat Setup](#vchat-setup) section
 
 ### Influences of Enabling Windows Exploit Protection
-Before enabling Windows Exploit Protection, the base addresses of *vulnserver.exe* and *essfunc.dll* are fixed at `0x00400000` and `0x62500000` respectively. This is because both are not marked as ASLR-compatible because they were not linked with the `/DYNAMICBASE` flag at compile time (?). Other modules in the Windows system are ASLR-compatible. Hence, their base addresses will change if the machine restarts as discussed [previously](#address-space-layout-randomization).
+Before enabling Windows Exploit Protection, the base addresses of *vchat.exe* and *essfunc.dll* are fixed at `0x00400000` and `0x62500000` respectively. This is because both are not marked as ASLR-compatible because they were not linked with the `/DYNAMICBASE` flag at compile time (?). Other modules in the Windows system are ASLR-compatible. Hence, their base addresses will change if the machine restarts as discussed [previously](#address-space-layout-randomization).
 
 1. We can first look at the base addresses of the modules VChat loads: In Immunity debugger access the Executable modules table by accessing the following tabs (View -> Executable modules or <Alt+E>) This is shown below.
 
@@ -126,7 +126,7 @@ Before enabling Windows Exploit Protection, the base addresses of *vulnserver.ex
 https://stackoverflow.com/questions/6002359/so-most-of-the-binary-is-composed-of-reloc-table 
 https://www.codeproject.com/Articles/12532/Inject-your-code-to-a-Portable-Executable-file#ImplementRelocationTable7_2
 -->
-3. Now that we have enabled the Windows Exploit Protections, forced ASLR will take effect and the base addresses of all DLLs (including essfunc.dll) will be randomized each time the victim machine restarts. Vulnserver.exe would not be randomized because it does not contain a [.reloc section](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#the-reloc-section-image-only) which is required for the host system to rebase the modules successfully. The `.reloc` section contains the information required by the dynamic linker in order to factor in the difference between the expected and actual location in memory of pointers and functions within the module that have had their absolute addresses changed due to the relocations. This table allows us to refer to the addresses within a relocated file as a constant offset from some base address.
+3. Now that we have enabled the Windows Exploit Protections, forced ASLR will take effect and the base addresses of all DLLs (including essfunc.dll) will be randomized each time the victim machine restarts. vchat.exe would not be randomized because it does not contain a [.reloc section](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#the-reloc-section-image-only) which is required for the host system to rebase the modules successfully. The `.reloc` section contains the information required by the dynamic linker in order to factor in the difference between the expected and actual location in memory of pointers and functions within the module that have had their absolute addresses changed due to the relocations. This table allows us to refer to the addresses within a relocated file as a constant offset from some base address.
 
     1. Let's look at the Memory view of the loaded process to confirm this: In Immunity debugger, access the Memory View table by accessing the following tabs (Immunity debugger: View -> Memory <Alt+M>).
 
@@ -224,7 +224,7 @@ To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible modu
     ```
     * It may take a few tries to get a working chain.
 
-    We selected the combination of `vulnserver.exe` and `ntdll.dll` and got the following ROP chain.
+    We selected the combination of `vchat.exe` and `ntdll.dll` and got the following ROP chain.
     ```
         #[---INFO:gadgets_to_set_esi:---]
         0x771e7a5a,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
@@ -363,7 +363,7 @@ We can verify this ROP chain and our gadget offsets by modifying our exploit cod
     https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/001e199c-0874-4224-8eee-dea220ce3160
 
 
-### Automatically Restart vulnserver.exe when it crashes
+### Automatically Restart vchat.exe when it crashes
 While brute-forcing the base address of the DLL, some bad guesses will crash the target VChat process. We need to write a simple *batch* (bat) file for VChat to restart it automatically, this will simplify the exploitation process.
 
 Create and run the [restart.bat](./SourceCode/restart.bat) batch file. For this to work, the batch file and *vchat.exe* need to be in the same directory.
