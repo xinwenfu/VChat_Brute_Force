@@ -63,6 +63,7 @@ This section covers the compilation process, and use of the VChat Server. We inc
     <img src="Images/VS-L3.png">
 
 8. Apply the configuration changes and build the Project, our executable will be in the *Debug* folder. You can then launch the executable!
+
 ### MinGW/GCC
    1. Compile VChat and it's dependencies if they have not already been compiled. This is done with mingw.
       1. Create the essfunc object File.
