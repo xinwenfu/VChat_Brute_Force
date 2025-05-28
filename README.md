@@ -330,6 +330,7 @@ We can verify this ROP chain and our gadget offsets by modifying our exploit cod
 
 ### Locate a RETN instruction address and pick one that does not have the (READONLY) flag set.
 We need to find a retn instruction for the exploit. We will find one in the same module from which the ROP chain is found.
+
 	```
 	!mona find -type instr -s "retn" -p 1000 -m combase.dll
 	```
