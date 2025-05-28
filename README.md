@@ -221,11 +221,11 @@ To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible modu
     ```
     !mona rop -m vchat.exe,<filename> -n
 
-    # e.g. !mona rop -m vchat.exe,ntdll.dll -n
+    # e.g. !mona rop -m vchat.exe,combase.dll -n
     ```
     * It may take a few tries to get a working chain.
 
-    We selected the combination of `vchat.exe` and `ntdll.dll` and got the following ROP chain.
+    We selected the combination of `vchat.exe` and `combase.dll` and got the following ROP chain.
     ```
         #[---INFO:gadgets_to_set_esi:---]
         0x771e7a5a,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
@@ -299,7 +299,7 @@ To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible modu
 
 
 ### Rewriting the ROP chain
-Since we will be searching for the base of the `ntdll.dll` library, we need to rewrite the ROP chain so the addresses of instructions are in the format of **base + offset** because the offset of functions and their instructions in the loaded DLL do not change in relation to each other and the base address of the DLL. Here, *base* is a variable, and offset is a constant because, as mentioned earlier, this will not change unless the DLL is recompiled. The offset for each instruction can be calculated using the following formula: *offset = instruction address - base*.
+Since we will be searching for the base of the `combase.dll` library, we need to rewrite the ROP chain so the addresses of instructions are in the format of **base + offset** because the offset of functions and their instructions in the loaded DLL do not change in relation to each other and the base address of the DLL. Here, *base* is a variable, and offset is a constant because, as mentioned earlier, this will not change unless the DLL is recompiled. The offset for each instruction can be calculated using the following formula: *offset = instruction address - base*.
 
 > [!IMPORTANT]
 > Don't update the Windows 10/11 virtual machine between generation and use otherwise the ROP chain generated might be different. [How to Turn Off Automatic Updates on Windows 10](https://www.cleverfiles.com/howto/disable-update-windows-10.html)
