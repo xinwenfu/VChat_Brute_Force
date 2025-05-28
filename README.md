@@ -328,6 +328,23 @@ We can verify this ROP chain and our gadget offsets by modifying our exploit cod
 
     https://github.com/DaintyJet/VChat_Brute_Force/assets/60448620/001e199c-0874-4224-8eee-dea220ce3160
 
+### Locate a RETN instruction address and pick one that does not have the (READONLY) flag set.
+We need to find a retn instruction for the exploit. We will find one in the same module from which the ROP chain is found.
+	```
+	!mona find -type instr -s "retn" -p 1000 -m combase.dll
+	```
+	* `!mona`: Run mona.py commands.
+	* `find`: Locate something withing the binary which has been loaded into Immunity debugger.
+	* `-type`: Specify the type of the object string we are searching for.
+		* `asc`: Search for an asci string.
+		* `bin`: Search for a binary string.
+		* `ptr`: Search for a pointer (memory address).
+		* `instr`: Search for a instruction.
+		* `file`: Search for a file.
+	* `-s "<String>"`: Specify the string we are searching for.
+	* `-p <number>`: Limit amount of output to the number we specify (May need to increase this to find instructions at an executable location).
+	* `-m`: specify modules to search
+
 
 ### Automatically Restart vchat.exe when it crashes
 While brute-forcing the base address of the DLL, some bad guesses will crash the target VChat process. We need to write a simple *batch* (bat) file for VChat to restart it automatically, this will simplify the exploitation process.
@@ -395,6 +412,7 @@ Now, we can modify the exploit program to brute force the base address of the ta
 The Python script automatically creates a Telnet session once the correct base address is hit (if there is no false positive).
 
 [![Video of running attack script](/images/bruteforce.png)](https://www.youtube.com/watch?v=8WSIHlDKPFE)
+
 
 > [!NOTE]
 > In the test case, we ran into 3 false positives, which required us to adjust the lower_bound starting point.
