@@ -410,7 +410,7 @@ Now, we can modify the exploit program to brute force the base address of the ta
    * Sometimes, you may get a false positive at a specific address. In this case, it is best to increase the starting (lower) address to bypass this.
 
 
-The Python script automatically creates a Telnet session once the correct base address is hit (if there is no false positive).
+The Python script automatically creates a *nc* (or Telnet) session once the correct base address is hit (if there is no false positive).
 
 [![Video of running attack script](https://img.youtube.com/vi/8WSIHlDKPFE/mqdefault.jpg)](https://www.youtube.com/watch?v=8WSIHlDKPFE)
 
