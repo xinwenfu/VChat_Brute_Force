@@ -412,7 +412,7 @@ Now, we can modify the exploit program to brute force the base address of the ta
 
 The Python script automatically creates a Telnet session once the correct base address is hit (if there is no false positive).
 
-[![Video of running attack script](/images/bruteforce.png)](https://www.youtube.com/watch?v=8WSIHlDKPFE)
+[![Video of running attack script](https://img.youtube.com/vi/8WSIHlDKPFE/mqdefault.jpg)](https://www.youtube.com/watch?v=8WSIHlDKPFE)
 
 
 > [!NOTE]
